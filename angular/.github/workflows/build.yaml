@@ -11,7 +11,7 @@ on:
 
 jobs:
   DeployDev:
-    name: Deploy to Dev
+    name: Angular
     runs-on: ubuntu-latest
     concurrency:
       group: ci-cd-${{ github.workflow }}-${{ github.ref }}
