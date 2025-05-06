@@ -12,12 +12,12 @@ on:
 
 jobs:
   DeployDev:
-    name: Deploy to Dev
+    name: Django
     runs-on: ubuntu-latest
     concurrency:
       group: ci-cd-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
-    if: github.ref == 'refs/heads/dev'
+    # if: github.ref == 'refs/heads/dev'
 
     steps:
       - name: Checkout Code
