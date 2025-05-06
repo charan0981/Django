@@ -1,5 +1,6 @@
 name: Backend Builds
 run-name: Triggered build for:- ${{ github.event.head_commit.message }}
+
 on:
   workflow_dispatch:
   push:
@@ -11,7 +12,7 @@ on:
 
 jobs:
   DeployDev:
-    name: Deploy to Dev
+    name: Django 
     runs-on: ubuntu-latest
     concurrency:
       group: ci-cd-${{ github.workflow }}-${{ github.ref }}
@@ -22,10 +23,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -34,7 +36,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Login to ECR, Build Django Image, Tag, and Push
+      - name: Login to Amazon ECR, Build Image, Tag, and Push
         run: |
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 058264124336.dkr.ecr.ap-south-1.amazonaws.com
           docker build -t django .
