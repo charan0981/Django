@@ -7,12 +7,12 @@ on:
     branches:
       - main
     paths:
-      - 'apps/**'
+      - 'apps/**' 
       - 'libs/**'
 
 jobs:
   DeployDev:
-    name: Deploy to Dev
+    name: Django
     runs-on: ubuntu-latest
     concurrency:
       group: ci-cd-${{ github.workflow }}-${{ github.ref }}
@@ -23,30 +23,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Python 3.7 manually via pyenv
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
-            libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-            xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-
-          curl https://pyenv.run | bash
-
-          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $GITHUB_ENV
-          echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $GITHUB_ENV
-          echo 'eval "$(pyenv init --path)"' >> $GITHUB_ENV
-          echo 'eval "$(pyenv init -)"' >> $GITHUB_ENV
-          echo 'eval "$(pyenv virtualenv-init -)"' >> $GITHUB_ENV
-
-          export PYENV_ROOT="$HOME/.pyenv"
-          export PATH="$PYENV_ROOT/bin:$PATH"
-          eval "$(pyenv init --path)"
-          eval "$(pyenv init -)"
-          eval "$(pyenv virtualenv-init -)"
-
-          pyenv install 3.7.17
-          pyenv global 3.7.17
-          python --version
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -61,3 +42,4 @@ jobs:
           docker build -t django .
           docker tag django:latest 058264124336.dkr.ecr.ap-south-1.amazonaws.com/django:latest
           docker push 058264124336.dkr.ecr.ap-south-1.amazonaws.com/django:latest
+
