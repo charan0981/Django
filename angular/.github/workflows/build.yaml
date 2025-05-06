@@ -1,0 +1,37 @@
+name: Frontend Builds
+run-name: Triggered build for:- ${{ github.event.head_commit.message }}
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/**' 
+      - 'libs/**'
+
+jobs:
+  DeployDev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ci-cd-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    if: github.ref == 'refs/heads/dev'
+
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Login, Build, Tag, and Push to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 058264124336.dkr.ecr.ap-south-1.amazonaws.com
+          docker build -t angular .
+          docker tag angular:latest 058264124336.dkr.ecr.ap-south-1.amazonaws.com/angular:latest
+          docker push 058264124336.dkr.ecr.ap-south-1.amazonaws.com/angular:latest
