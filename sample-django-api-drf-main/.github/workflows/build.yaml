@@ -19,7 +19,7 @@ jobs:
     if: github.ref == 'refs/heads/dev'
 
     steps:
-      - name: CheckOut
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Configure AWS credentials
@@ -29,9 +29,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Login, Build, Tag, and Push to Amazon ECR
+      - name: Login to ECR, Build Django, Tag and Push
         run: |
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 058264124336.dkr.ecr.ap-south-1.amazonaws.com
-          docker build -t angular .
-          docker tag angular:latest 058264124336.dkr.ecr.ap-south-1.amazonaws.com/angular:latest
-          docker push 058264124336.dkr.ecr.ap-south-1.amazonaws.com/angular:latest
+          docker build -t django .
+          docker tag django:latest 058264124336.dkr.ecr.ap-south-1.amazonaws.com/django:latest
+          docker push 058264124336.dkr.ecr.ap-south-1.amazonaws.com/django:latest
+
